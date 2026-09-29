@@ -1,0 +1,215 @@
+{
+  "guarnicao-1": {
+    "disponivel": false
+  },
+  "guarnicao-2": {
+    "disponivel": true
+  },
+  "guarnicao-3": {
+    "disponivel": true
+  },
+  "guarnicao-4": {
+    "disponivel": true
+  },
+  "guarnicao-5": {
+    "disponivel": true
+  },
+  "guarnicao-6": {
+    "disponivel": true
+  },
+  "guarnicao-7": {
+    "disponivel": true
+  },
+  "guarnicao-8": {
+    "disponivel": true
+  },
+  "guarnicao-9": {
+    "disponivel": true
+  },
+  "proteina-1": {
+    "disponivel": false
+  },
+  "proteina-2": {
+    "disponivel": true
+  },
+  "proteina-3": {
+    "disponivel": true
+  },
+  "proteina-4": {
+    "disponivel": true
+  },
+  "proteina-5": {
+    "disponivel": true
+  },
+  "proteina-6": {
+    "disponivel": true
+  },
+  "proteina-7": {
+    "disponivel": true
+  },
+  "proteina-8": {
+    "disponivel": true
+  },
+  "proteina-9": {
+    "disponivel": true
+  },
+  "proteina-10": {
+    "disponivel": true
+  },
+  "proteina-11": {
+    "disponivel": true
+  },
+  "proteina-12": {
+    "disponivel": true
+  },
+  "proteina-13": {
+    "disponivel": true
+  },
+  "proteina-14": {
+    "disponivel": true
+  },
+  "proteina-15": {
+    "disponivel": true
+  },
+  "proteina-16": {
+    "disponivel": true
+  },
+  "proteina-17": {
+    "disponivel": true
+  },
+  "proteina-18": {
+    "disponivel": true
+  },
+  "proteina-19": {
+    "disponivel": true
+  },
+  "proteina-20": {
+    "disponivel": true
+  },
+  "proteina-21": {
+    "disponivel": true
+  },
+  "proteina-22": {
+    "disponivel": true
+  },
+  "proteina-23": {
+    "disponivel": true
+  },
+  "proteina-24": {
+    "disponivel": true
+  },
+  "proteina-25": {
+    "disponivel": true
+  },
+  "proteina-26": {
+    "disponivel": true
+  },
+  "proteina-27": {
+    "disponivel": true
+  },
+  "proteina-28": {
+    "disponivel": true
+  },
+  "proteina-29": {
+    "disponivel": true
+  },
+  "proteina-30": {
+    "disponivel": true
+  },
+  "proteina-31": {
+    "disponivel": true
+  },
+  "proteina-32": {
+    "disponivel": true
+  },
+  "proteina-33": {
+    "disponivel": true
+  },
+  "proteina-34": {
+    "disponivel": true
+  },
+  "proteina-35": {
+    "disponivel": true
+  },
+  "bebida-gaseificada-1": {
+    "disponivel": true
+  },
+  "bebida-gaseificada-2": {
+    "disponivel": true
+  },
+  "bebida-gaseificada-3": {
+    "disponivel": true
+  },
+  "bebida-gaseificada-4": {
+    "disponivel": true
+  },
+  "bebida-gaseificada-5": {
+    "disponivel": true
+  },
+  "bebida-gaseificada-6": {
+    "disponivel": true
+  },
+  "bebida-gaseificada-7": {
+    "disponivel": true
+  },
+  "bebida-gaseificada-8": {
+    "disponivel": true
+  },
+  "bebida-suco-1": {
+    "disponivel": true
+  },
+  "bebida-polpa-1": {
+    "disponivel": true
+  },
+  "bebida-polpa-2": {
+    "disponivel": true
+  },
+  "bebida-polpa-3": {
+    "disponivel": true
+  },
+  "bebida-polpa-4": {
+    "disponivel": true
+  },
+  "bebida-polpa-5": {
+    "disponivel": true
+  },
+  "bebida-polpa-6": {
+    "disponivel": true
+  },
+  "bebida-polpa-7": {
+    "disponivel": true
+  },
+  "sobremesa-1": {
+    "disponivel": true
+  },
+  "sobremesa-2": {
+    "disponivel": true
+  },
+  "sobremesa-3": {
+    "disponivel": true
+  },
+  "sobremesa-4": {
+    "disponivel": true
+  },
+  "sobremesa-5": {
+    "disponivel": true
+  },
+  "sobremesa-6": {
+    "disponivel": true
+  },
+  "sobremesa-7": {
+    "disponivel": true
+  },
+  "sobremesa-8": {
+    "disponivel": true
+  },
+  "sobremesa-9": {
+    "disponivel": true
+  },
+  "sobremesa-10": {
+    "disponivel": true
+  },
+  "sobremesa-11": {
+    "disponivel": true
+  }
+}

@@ -1,0 +1,14 @@
+if (!fs.existsSync(CONFIG_FILE)) {
+  const defaultConfig = {
+    nomeRestaurante: "Restaurante do Irmão",
+    whatsapp: "5581999999999",
+    chavePix: "81999999999",
+    horarioFuncionamento: {
+      abertura: "10:00",
+      fechamento: "13:00"
+    }
+  };
+  fs.writeFileSync(CONFIG_FILE, JSON.stringify(defaultConfig,
+  null,
+  2));
+}

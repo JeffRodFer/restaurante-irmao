@@ -1,0 +1,22 @@
+{
+  "name": "restaurante-do-irmao",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Sistema de pedidos do Restaurante do Irmão com cálculo oficial no servidor.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "hash-password": "node scripts/generate-password-hash.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.23.0"
+  }
+}
