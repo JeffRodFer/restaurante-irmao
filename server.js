@@ -1539,104 +1539,35 @@ app.put(
   requireAdmin,
   sameOrigin,
   async (req, res) => {
-
     try {
+      const changes = req.body?.changes;
 
-      const changes =
-        req.body?.changes;
-
-      if (
-        !Array.isArray(changes) ||
-        changes.length >
-        MENU_BASE.length
-      ) {
-
-        return res.status(400).json({
-          erro:
-            'Dados de disponibilidade inválidos.'
-        });
-
+      // Verifica apenas se os dados são uma lista válida, 
+      // sem usar o MENU_BASE para não bloquear itens novos (bebidas/sobremesas)
+      if (!Array.isArray(changes)) {
+        return res.status(400).json({ erro: 'Dados de disponibilidade inválidos.' });
       }
 
-      const validIds =
-        new Set(
-          MENU_BASE.map(
-            item => item.id
-          )
-        );
+      // Percorre os itens e atualiza diretamente na base de dados
+      for (const change of changes) {
+        if (change && change.id != null && typeof change.disponivel === 'boolean') {
 
-      const seen =
-        new Set();
-
-      for (
-        const change of changes
-      ) {
-
-        if (
-          !change ||
-          !validIds.has(
-            change.id
-          ) ||
-          typeof change.disponivel !==
-          'boolean' ||
-          seen.has(change.id)
-        ) {
-
-          return res.status(400).json({
-            erro:
-              'Alteração de menu inválida.'
-          });
-
+          // Removemos o "atualizado_em" para não dar conflito com a tabela no Neon
+          await pool.query(
+            'UPDATE menu_items SET disponivel = $1 WHERE id = $2',
+            [change.disponivel, change.id]
+          );
         }
-
-        seen.add(
-          change.id
-        );
-
       }
 
-      for (
-        const change of changes
-      ) {
-
-        await pool.query(
-          `
-            UPDATE menu_items
-            SET
-              disponivel = $1,
-              atualizado_em = NOW()
-            WHERE id = $2
-          `,
-          [
-            change.disponivel,
-            change.id
-          ]
-        );
-
-      }
-
-      const itens =
-        await publicMenu();
-
-      res.json({
-        ok: true,
-        itens
-      });
+      // Devolve a lista fresca diretamente da base de dados
+      const itens = await publicMenu();
+      res.json({ ok: true, itens });
 
     } catch (error) {
-
-      console.error(
-        'Erro ao atualizar disponibilidade do menu:',
-        error
-      );
-
-      res.status(500).json({
-        erro:
-          'Não foi possível salvar o menu.'
-      });
-
+      console.error('Erro ao atualizar disponibilidade do menu:', error);
+      res.status(500).json({ erro: 'Não foi possível salvar o menu.' });
     }
-
   }
 );
 
