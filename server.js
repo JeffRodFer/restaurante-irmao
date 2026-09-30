@@ -26,29 +26,32 @@ if (dbUrl) {
 
   console.log("Conexão com o banco configurada com sucesso.");
 
-  pool.query(`
-    CREATE TABLE IF NOT EXISTS config (
-      id INT PRIMARY KEY DEFAULT 1,
-      dados JSONB NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS pedidos (
-      id SERIAL PRIMARY KEY,
-      dados JSONB NOT NULL,
-      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-    CREATE TABLE IF NOT EXISTS menu_items (
-      id SERIAL PRIMARY KEY,
-      nome VARCHAR(255) NOT NULL,
-      categoria VARCHAR(255) NOT NULL,
-      preco NUMERIC(10,2) DEFAULT 0,
-      descricao TEXT,
-      disponivel BOOLEAN DEFAULT true
-    );
-  `)
-    .then(async () => {
+  // Função assíncrona isolada para evitar erros de sintaxe e travamentos
+  async function initDatabase() {
+    try {
+      // 1. Cria as tabelas necessárias
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS config (
+          id INT PRIMARY KEY DEFAULT 1,
+          dados JSONB NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS pedidos (
+          id SERIAL PRIMARY KEY,
+          dados JSONB NOT NULL,
+          criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        CREATE TABLE IF NOT EXISTS menu_items (
+          id SERIAL PRIMARY KEY,
+          nome VARCHAR(255) NOT NULL,
+          categoria VARCHAR(255) NOT NULL,
+          preco NUMERIC(10,2) DEFAULT 0,
+          descricao TEXT,
+          disponivel BOOLEAN DEFAULT true
+        );
+      `);
       console.log("✅ Tabelas (config, pedidos, menu_items) criadas/verificadas no PostgreSQL!");
 
-      // 1. Inicializa tabela config se estiver vazia
+      // 2. Inicializa a tabela config se estiver vazia
       const resConfig = await pool.query('SELECT dados FROM config WHERE id = 1');
       if (resConfig.rowCount === 0 || !resConfig.rows[0].dados.produtos || resConfig.rows[0].dados.produtos.length === 0) {
         const configInicial = {
@@ -64,49 +67,52 @@ if (dbUrl) {
         };
 
         await pool.query(`
-        INSERT INTO config (id, dados) 
-        VALUES (1, $1) 
-        ON CONFLICT (id) DO UPDATE SET dados = $1
-      `, [JSON.stringify(configInicial)]);
+          INSERT INTO config (id, dados) 
+          VALUES (1, $1) 
+          ON CONFLICT (id) DO UPDATE SET dados = $1
+        `, [JSON.stringify(configInicial)]);
 
         console.log("✅ Cardápio inicial populado na tabela config!");
       }
 
-      // 2. Inicializa tabela menu_items se estiver vazia
+      // 3. Inicializa a tabela menu_items se estiver vazia
       const resMenu = await pool.query('SELECT COUNT(*) FROM menu_items');
       if (parseInt(resMenu.rows[0].count) === 0) {
         const seedQuery = `
-        INSERT INTO menu_items (nome, categoria, preco) VALUES
-        ('Arroz Branco', 'Guarnições', 0),
-        ('Arroz Carioca', 'Guarnições', 0),
-        ('Feijão Macassar', 'Guarnições', 0),
-        ('Feijão Mulato', 'Guarnições', 0),
-        ('Feijão Preto', 'Guarnições', 0),
-        ('Legumes', 'Guarnições', 0),
-        ('Macarrão', 'Guarnições', 0),
-        ('Purê', 'Guarnições', 0),
-        ('Salada', 'Guarnições', 0),
-        ('Almôndegas ao molho', 'Proteínas', 0),
-        ('Empadão de frango', 'Proteínas', 0),
-        ('Escondidinho de charque', 'Proteínas', 0),
-        ('Feijoada', 'Proteínas', 0),
-        ('Fígado acebolado', 'Proteínas', 0),
-        ('Frango a Parmegiana', 'Proteínas', 0),
-        ('Frango a quatro queijos com calabresa', 'Proteínas', 0),
-        ('Frango grelhado', 'Proteínas', 0);
-      `;
+          INSERT INTO menu_items (nome, categoria, preco) VALUES
+          ('Arroz Branco', 'Guarnições', 0),
+          ('Arroz Carioca', 'Guarnições', 0),
+          ('Feijão Macassar', 'Guarnições', 0),
+          ('Feijão Mulato', 'Guarnições', 0),
+          ('Feijão Preto', 'Guarnições', 0),
+          ('Legumes', 'Guarnições', 0),
+          ('Macarrão', 'Guarnições', 0),
+          ('Purê', 'Guarnições', 0),
+          ('Salada', 'Guarnições', 0),
+          ('Almôndegas ao molho', 'Proteínas', 0),
+          ('Empadão de frango', 'Proteínas', 0),
+          ('Escondidinho de charque', 'Proteínas', 0),
+          ('Feijoada', 'Proteínas', 0),
+          ('Fígado acebolado', 'Proteínas', 0),
+          ('Frango a Parmegiana', 'Proteínas', 0),
+          ('Frango a quatro queijos com calabresa', 'Proteínas', 0),
+          ('Frango grelhado', 'Proteínas', 0);
+        `;
         await pool.query(seedQuery);
         console.log("✅ Tabela menu_items populada com sucesso!");
       }
-    })
-    .catch(err => {
-      console.error("❌ Erro ao criar/popular tabelas no PostgreSQL:", err);
-    });
+
+    } catch (err) {
+      console.error("❌ Erro ao inicializar o banco de dados:", err);
+    }
+  }
+
+  // Executa a inicialização do banco
+  initDatabase();
 
 } else {
   console.log("DATABASE_URL não encontrada. Servidor rodando sem banco local.");
-}  // Apaga o registro vazio anterior para forçar a criação com produtos
-const res = await pool.query('SELECT dados FROM config WHERE id = 1');
+} const res = await pool.query('SELECT dados FROM config WHERE id = 1');
 if (res.rowCount === 0 || !res.rows[0].dados.produtos || res.rows[0].dados.produtos.length === 0) {
 
   const configInicial = {
