@@ -785,6 +785,7 @@ app.get('/api/menu', async (req, res) => {
         itens = await publicMenu();
       }
     } catch (err) {
+      console.error("❌ O VERDADEIRO ERRO É:", err);
       console.warn("Tabela menu_items ainda não existe no Neon. Usando lista padrão.");
     }
 
