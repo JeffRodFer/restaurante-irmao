@@ -26,16 +26,23 @@ if (dbUrl) {
   console.log("Conexão com o banco configurada com sucesso.");
 
   pool.query(`
-    CREATE TABLE IF NOT EXISTS config (
-      id INT PRIMARY KEY DEFAULT 1,
-      dados JSONB NOT NULL
-    );
-    CREATE TABLE IF NOT EXISTS pedidos (
-      id SERIAL PRIMARY KEY,
-      dados JSONB NOT NULL,
-      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `)
+  CREATE TABLE IF NOT EXISTS config (
+    id INT PRIMARY KEY DEFAULT 1,
+    dados JSONB NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS pedidos (
+    id SERIAL PRIMARY KEY,
+    dados JSONB NOT NULL,
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
+  CREATE TABLE IF NOT EXISTS menu_items (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(255),
+    categoria VARCHAR(255),
+    preco NUMERIC,
+    descricao TEXT
+  );
+`)
     .then(async () => {
       console.log("✅ Tabelas criadas/verificadas no PostgreSQL!");
 
@@ -717,42 +724,36 @@ app.get('/api/config', (req, res) => {
 app.get('/api/menu', async (req, res) => {
   try {
     let itens = [];
-    
-    // Tenta buscar os itens usando a sua função atual
-    if (typeof publicMenu === 'function') {
-      itens = await publicMenu();
-    }
 
-    // Se a tabela no banco do Neon estiver vazia, usa a lista de produtos padrão
-    if (!itens || itens.length === 0) {
-      if (pool) {
-        const result = await pool.query('SELECT dados FROM config WHERE id = 1');
-        if (result.rows.length > 0 && result.rows[0].dados.produtos) {
-          itens = result.rows[0].dados.produtos;
-        }
+    // Tenta buscar da função existente
+    try {
+      if (typeof publicMenu === 'function') {
+        itens = await publicMenu();
       }
+    } catch (err) {
+      console.warn("Tabela menu_items ainda não existe no Neon. Usando lista padrão.");
     }
 
-    // Fallback: garante que o site nunca fique sem produtos na tela
+    // Se não encontrou itens no banco ou a tabela não existe, usa os itens padrão:
     if (!itens || itens.length === 0) {
       itens = [
-        { id: 1, nome: "Arroz Branco", categoria: "Guarnições" },
-        { id: 2, nome: "Arroz Carioca", categoria: "Guarnições" },
-        { id: 3, nome: "Feijão Macassar", categoria: "Guarnições" },
-        { id: 4, nome: "Feijão Mulato", categoria: "Guarnições" },
-        { id: 5, nome: "Feijão Preto", categoria: "Guarnições" },
-        { id: 6, nome: "Legumes", categoria: "Guarnições" },
-        { id: 7, nome: "Macarrão", categoria: "Guarnições" },
-        { id: 8, nome: "Purê", categoria: "Guarnições" },
-        { id: 9, nome: "Salada", categoria: "Guarnições" },
-        { id: 10, nome: "Almôndegas ao molho", categoria: "Proteínas" },
-        { id: 11, nome: "Empadão de frango", categoria: "Proteínas" },
-        { id: 12, nome: "Escondidinho de charque", categoria: "Proteínas" },
-        { id: 13, nome: "Feijoada", categoria: "Proteínas" },
-        { id: 14, nome: "Fígado acebolado", categoria: "Proteínas" },
-        { id: 15, nome: "Frango a Parmegiana", categoria: "Proteínas" },
-        { id: 16, nome: "Frango a quatro queijos com calabresa", categoria: "Proteínas" },
-        { id: 17, nome: "Frango grelhado", categoria: "Proteínas" }
+        { id: 1, nome: "Arroz Branco", categoria: "Guarnições", preco: 0 },
+        { id: 2, nome: "Arroz Carioca", categoria: "Guarnições", preco: 0 },
+        { id: 3, nome: "Feijão Macassar", categoria: "Guarnições", preco: 0 },
+        { id: 4, nome: "Feijão Mulato", categoria: "Guarnições", preco: 0 },
+        { id: 5, nome: "Feijão Preto", categoria: "Guarnições", preco: 0 },
+        { id: 6, nome: "Legumes", categoria: "Guarnições", preco: 0 },
+        { id: 7, nome: "Macarrão", categoria: "Guarnições", preco: 0 },
+        { id: 8, nome: "Purê", categoria: "Guarnições", preco: 0 },
+        { id: 9, nome: "Salada", categoria: "Guarnições", preco: 0 },
+        { id: 10, nome: "Almôndegas ao molho", categoria: "Proteínas", preco: 0 },
+        { id: 11, nome: "Empadão de frango", categoria: "Proteínas", preco: 0 },
+        { id: 12, nome: "Escondidinho de charque", categoria: "Proteínas", preco: 0 },
+        { id: 13, nome: "Feijoada", categoria: "Proteínas", preco: 0 },
+        { id: 14, nome: "Fígado acebolado", categoria: "Proteínas", preco: 0 },
+        { id: 15, nome: "Frango a Parmegiana", categoria: "Proteínas", preco: 0 },
+        { id: 16, nome: "Frango a quatro queijos com calabresa", categoria: "Proteínas", preco: 0 },
+        { id: 17, nome: "Frango grelhado", categoria: "Proteínas", preco: 0 }
       ];
     }
 
@@ -763,7 +764,7 @@ app.get('/api/menu', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Erro ao carregar menu:', error);
+    console.error('Erro geral no /api/menu:', error);
     res.status(500).json({ erro: 'Não foi possível carregar o menu.' });
   }
 });
