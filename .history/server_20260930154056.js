@@ -25,6 +25,7 @@ if (dbUrl) {
   });
   console.log("Conexão com o banco configurada com sucesso.");
 
+  // Inicializa as tabelas no PostgreSQL se não existirem
   pool.query(`
     CREATE TABLE IF NOT EXISTS config (
       id INT PRIMARY KEY DEFAULT 1,
@@ -39,33 +40,19 @@ if (dbUrl) {
     .then(async () => {
       console.log("✅ Tabelas criadas/verificadas no PostgreSQL!");
 
-      // Apaga o registro vazio anterior para forçar a criação com produtos
-      const res = await pool.query('SELECT dados FROM config WHERE id = 1');
-      if (res.rowCount === 0 || !res.rows[0].dados.produtos || res.rows[0].dados.produtos.length === 0) {
-
+      // Verifica se a tabela config já possui dados cadastrados
+      const res = await pool.query('SELECT * FROM config WHERE id = 1');
+      if (res.rowCount === 0) {
         const configInicial = {
           restaurante: "Restaurante do Irmão",
           categorias: ["Guarnições", "Proteínas", "Bebidas e Sucos", "Sobremesas"],
-          produtos: [
-            { id: 1, nome: "Arroz Branco", categoria: "Guarnições", preco: "0.00", descricao: "Acompanhamento" },
-            { id: 2, nome: "Feijão Macassar", categoria: "Guarnições", preco: "0.00", descricao: "Acompanhamento" },
-            { id: 3, nome: "Escondidinho de Charque", categoria: "Proteínas", preco: "25.00", descricao: "Prato principal" },
-            { id: 4, nome: "Frango a Parmegiana", categoria: "Proteínas", preco: "22.00", descricao: "Prato principal" },
-            { id: 5, nome: "Suco Natural", categoria: "Bebidas e Sucos", preco: "7.00", descricao: "500ml" }
-          ]
+          produtos: []
         };
-
-        // Atualiza ou insere o cardápio padrão
-        await pool.query(`
-          INSERT INTO config (id, dados) 
-          VALUES (1, $1) 
-          ON CONFLICT (id) DO UPDATE SET dados = $1
-        `, [JSON.stringify(configInicial)]);
-
-        console.log("✅ Cardápio inicial populado no banco Neon!");
+        await pool.query('INSERT INTO config (id, dados) VALUES (1, $1)', [JSON.stringify(configInicial)]);
+        console.log("✅ Configuração padrão inicializada no banco do Neon!");
       }
     })
-    .catch(err => console.error("❌ Erro ao criar/popular tabelas:", err));
+    .catch(err => console.error("❌ Erro ao criar tabelas no PostgreSQL:", err));
 
 } else {
   console.log("DATABASE_URL não encontrada. Servidor rodando sem banco local.");
@@ -714,59 +701,32 @@ app.get('/api/config', (req, res) => {
    API DO CARDÁPIO
    ========================================================= */
 
-app.get('/api/menu', async (req, res) => {
-  try {
-    let itens = [];
-    
-    // Tenta buscar os itens usando a sua função atual
-    if (typeof publicMenu === 'function') {
-      itens = await publicMenu();
+app.get(
+  '/api/menu',
+  async (req, res) => {
+
+    try {
+      const itens = await publicMenu();
+
+      res.json({
+        basePrice: BASE_PRICE,
+        deliveryPrice: DELIVERY_PRICE,
+        itens
+      });
+
+    } catch (error) {
+      console.error(
+        'Erro ao carregar menu:',
+        error
+      );
+
+      res.status(500).json({
+        erro: 'Não foi possível carregar o menu.'
+      });
     }
 
-    // Se a tabela no banco do Neon estiver vazia, usa a lista de produtos padrão
-    if (!itens || itens.length === 0) {
-      if (pool) {
-        const result = await pool.query('SELECT dados FROM config WHERE id = 1');
-        if (result.rows.length > 0 && result.rows[0].dados.produtos) {
-          itens = result.rows[0].dados.produtos;
-        }
-      }
-    }
-
-    // Fallback: garante que o site nunca fique sem produtos na tela
-    if (!itens || itens.length === 0) {
-      itens = [
-        { id: 1, nome: "Arroz Branco", categoria: "Guarnições" },
-        { id: 2, nome: "Arroz Carioca", categoria: "Guarnições" },
-        { id: 3, nome: "Feijão Macassar", categoria: "Guarnições" },
-        { id: 4, nome: "Feijão Mulato", categoria: "Guarnições" },
-        { id: 5, nome: "Feijão Preto", categoria: "Guarnições" },
-        { id: 6, nome: "Legumes", categoria: "Guarnições" },
-        { id: 7, nome: "Macarrão", categoria: "Guarnições" },
-        { id: 8, nome: "Purê", categoria: "Guarnições" },
-        { id: 9, nome: "Salada", categoria: "Guarnições" },
-        { id: 10, nome: "Almôndegas ao molho", categoria: "Proteínas" },
-        { id: 11, nome: "Empadão de frango", categoria: "Proteínas" },
-        { id: 12, nome: "Escondidinho de charque", categoria: "Proteínas" },
-        { id: 13, nome: "Feijoada", categoria: "Proteínas" },
-        { id: 14, nome: "Fígado acebolado", categoria: "Proteínas" },
-        { id: 15, nome: "Frango a Parmegiana", categoria: "Proteínas" },
-        { id: 16, nome: "Frango a quatro queijos com calabresa", categoria: "Proteínas" },
-        { id: 17, nome: "Frango grelhado", categoria: "Proteínas" }
-      ];
-    }
-
-    res.json({
-      basePrice: typeof BASE_PRICE !== 'undefined' ? BASE_PRICE : 0,
-      deliveryPrice: typeof DELIVERY_PRICE !== 'undefined' ? DELIVERY_PRICE : 0,
-      itens
-    });
-
-  } catch (error) {
-    console.error('Erro ao carregar menu:', error);
-    res.status(500).json({ erro: 'Não foi possível carregar o menu.' });
   }
-});
+);
 
 
 /* =========================================================
