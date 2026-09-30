@@ -26,10 +26,10 @@ if (dbUrl) {
 
   console.log("Conexão com o banco configurada com sucesso.");
 
-  // Função assíncrona isolada para evitar erros de sintaxe e travamentos
-  async function initDatabase() {
+  // Função assíncrona auto-executável (IIFE)
+  (async () => {
     try {
-      // 1. Cria as tabelas necessárias
+      // 1. Criação das tabelas
       await pool.query(`
         CREATE TABLE IF NOT EXISTS config (
           id INT PRIMARY KEY DEFAULT 1,
@@ -51,7 +51,7 @@ if (dbUrl) {
       `);
       console.log("✅ Tabelas (config, pedidos, menu_items) criadas/verificadas no PostgreSQL!");
 
-      // 2. Inicializa a tabela config se estiver vazia
+      // 2. Inicialização da tabela config
       const resConfig = await pool.query('SELECT dados FROM config WHERE id = 1');
       if (resConfig.rowCount === 0 || !resConfig.rows[0].dados.produtos || resConfig.rows[0].dados.produtos.length === 0) {
         const configInicial = {
@@ -75,7 +75,7 @@ if (dbUrl) {
         console.log("✅ Cardápio inicial populado na tabela config!");
       }
 
-      // 3. Inicializa a tabela menu_items se estiver vazia
+      // 3. Inicialização da tabela menu_items
       const resMenu = await pool.query('SELECT COUNT(*) FROM menu_items');
       if (parseInt(resMenu.rows[0].count) === 0) {
         const seedQuery = `
@@ -103,16 +103,15 @@ if (dbUrl) {
       }
 
     } catch (err) {
-      console.error("❌ Erro ao inicializar o banco de dados:", err);
+      console.error("❌ Erro ao inicializar o banco no PostgreSQL:", err);
     }
-  }
-
-  // Executa a inicialização do banco
-  initDatabase();
+  })();
 
 } else {
   console.log("DATABASE_URL não encontrada. Servidor rodando sem banco local.");
-} const res = await pool.query('SELECT dados FROM config WHERE id = 1');
+}
+
+const res = await pool.query('SELECT dados FROM config WHERE id = 1');
 if (res.rowCount === 0 || !res.rows[0].dados.produtos || res.rows[0].dados.produtos.length === 0) {
 
   const configInicial = {
