@@ -24,9 +24,26 @@ if (dbUrl) {
     ssl: { rejectUnauthorized: false }
   });
   console.log("Conexão com o banco configurada com sucesso.");
+
+  // Inicializa as tabelas no PostgreSQL do Render se não existirem
+  pool.query(`
+    CREATE TABLE IF NOT EXISTS config (
+      id INT PRIMARY KEY DEFAULT 1,
+      dados JSONB NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS pedidos (
+      id SERIAL PRIMARY KEY,
+      dados JSONB NOT NULL,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `)
+    .then(() => console.log("✅ Tabelas criadas/verificadas no PostgreSQL!"))
+    .catch(err => console.error("❌ Erro ao criar tabelas no PostgreSQL:", err));
+
 } else {
   console.log("DATABASE_URL não encontrada. Servidor rodando sem banco local.");
 }
+
 const app = express();
 
 app.use(express.json());
