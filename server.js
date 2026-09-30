@@ -25,7 +25,6 @@ if (dbUrl) {
   });
   console.log("Conexão com o banco configurada com sucesso.");
 
-  // Inicializa as tabelas no PostgreSQL se não existirem
   pool.query(`
     CREATE TABLE IF NOT EXISTS config (
       id INT PRIMARY KEY DEFAULT 1,
@@ -40,19 +39,33 @@ if (dbUrl) {
     .then(async () => {
       console.log("✅ Tabelas criadas/verificadas no PostgreSQL!");
 
-      // Verifica se a tabela config já possui dados cadastrados
-      const res = await pool.query('SELECT * FROM config WHERE id = 1');
-      if (res.rowCount === 0) {
+      // Apaga o registro vazio anterior para forçar a criação com produtos
+      const res = await pool.query('SELECT dados FROM config WHERE id = 1');
+      if (res.rowCount === 0 || !res.rows[0].dados.produtos || res.rows[0].dados.produtos.length === 0) {
+
         const configInicial = {
           restaurante: "Restaurante do Irmão",
           categorias: ["Guarnições", "Proteínas", "Bebidas e Sucos", "Sobremesas"],
-          produtos: []
+          produtos: [
+            { id: 1, nome: "Arroz Branco", categoria: "Guarnições", preco: "0.00", descricao: "Acompanhamento" },
+            { id: 2, nome: "Feijão Macassar", categoria: "Guarnições", preco: "0.00", descricao: "Acompanhamento" },
+            { id: 3, nome: "Escondidinho de Charque", categoria: "Proteínas", preco: "25.00", descricao: "Prato principal" },
+            { id: 4, nome: "Frango a Parmegiana", categoria: "Proteínas", preco: "22.00", descricao: "Prato principal" },
+            { id: 5, nome: "Suco Natural", categoria: "Bebidas e Sucos", preco: "7.00", descricao: "500ml" }
+          ]
         };
-        await pool.query('INSERT INTO config (id, dados) VALUES (1, $1)', [JSON.stringify(configInicial)]);
-        console.log("✅ Configuração padrão inicializada no banco do Neon!");
+
+        // Atualiza ou insere o cardápio padrão
+        await pool.query(`
+          INSERT INTO config (id, dados) 
+          VALUES (1, $1) 
+          ON CONFLICT (id) DO UPDATE SET dados = $1
+        `, [JSON.stringify(configInicial)]);
+
+        console.log("✅ Cardápio inicial populado no banco Neon!");
       }
     })
-    .catch(err => console.error("❌ Erro ao criar tabelas no PostgreSQL:", err));
+    .catch(err => console.error("❌ Erro ao criar/popular tabelas:", err));
 
 } else {
   console.log("DATABASE_URL não encontrada. Servidor rodando sem banco local.");
