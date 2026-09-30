@@ -23,33 +23,33 @@ if (dbUrl) {
     connectionString: dbUrl,
     ssl: { rejectUnauthorized: false }
   });
-  console.log("Conexão com o banco configurada com sucesso.");
 
+  // Executa a criação das tabelas no banco de dados
   pool.query(`
-  CREATE TABLE IF NOT EXISTS config (
-    id INT PRIMARY KEY DEFAULT 1,
-    dados JSONB NOT NULL
-  );
-  CREATE TABLE IF NOT EXISTS pedidos (
-    id SERIAL PRIMARY KEY,
-    dados JSONB NOT NULL,
-    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  );
-  CREATE TABLE IF NOT EXISTS menu_items (
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(255),
-    categoria VARCHAR(255),
-    preco NUMERIC,
-    descricao TEXT
-  );
-`)
+    CREATE TABLE IF NOT EXISTS config (
+      id INT PRIMARY KEY DEFAULT 1,
+      dados JSONB NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS pedidos (
+      id SERIAL PRIMARY KEY,
+      dados JSONB NOT NULL,
+      criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS menu_items (
+      id SERIAL PRIMARY KEY,
+      nome VARCHAR(255) NOT NULL,
+      categoria VARCHAR(255) NOT NULL,
+      preco NUMERIC(10,2) DEFAULT 0,
+      descricao TEXT,
+      disponivel BOOLEAN DEFAULT true
+    );
+  `)
     .then(async () => {
-      console.log("✅ Tabelas criadas/verificadas no PostgreSQL!");
+      console.log("✅ Tabelas (config, pedidos, menu_items) criadas/verificadas no PostgreSQL!");
 
-      // Apaga o registro vazio anterior para forçar a criação com produtos
-      const res = await pool.query('SELECT dados FROM config WHERE id = 1');
-      if (res.rowCount === 0 || !res.rows[0].dados.produtos || res.rows[0].dados.produtos.length === 0) {
-
+      // 1. Inicializa tabela config se estiver vazia
+      const resConfig = await pool.query('SELECT dados FROM config WHERE id = 1');
+      if (resConfig.rowCount === 0 || !resConfig.rows[0].dados.produtos || resConfig.rows[0].dados.produtos.length === 0) {
         const configInicial = {
           restaurante: "Restaurante do Irmão",
           categorias: ["Guarnições", "Proteínas", "Bebidas e Sucos", "Sobremesas"],
@@ -62,17 +62,77 @@ if (dbUrl) {
           ]
         };
 
-        // Atualiza ou insere o cardápio padrão
         await pool.query(`
           INSERT INTO config (id, dados) 
           VALUES (1, $1) 
           ON CONFLICT (id) DO UPDATE SET dados = $1
         `, [JSON.stringify(configInicial)]);
 
-        console.log("✅ Cardápio inicial populado no banco Neon!");
+        console.log("✅ Cardápio inicial populado na tabela config!");
+      }
+
+      // 2. Inicializa tabela menu_items se estiver vazia
+      const resMenu = await pool.query('SELECT COUNT(*) FROM menu_items');
+      if (parseInt(resMenu.rows[0].count) === 0) {
+        const seedQuery = `
+          INSERT INTO menu_items (nome, categoria, preco) VALUES
+          ('Arroz Branco', 'Guarnições', 0),
+          ('Arroz Carioca', 'Guarnições', 0),
+          ('Feijão Macassar', 'Guarnições', 0),
+          ('Feijão Mulato', 'Guarnições', 0),
+          ('Feijão Preto', 'Guarnições', 0),
+          ('Legumes', 'Guarnições', 0),
+          ('Macarrão', 'Guarnições', 0),
+          ('Purê', 'Guarnições', 0),
+          ('Salada', 'Guarnições', 0),
+          ('Almôndegas ao molho', 'Proteínas', 0),
+          ('Empadão de frango', 'Proteínas', 0),
+          ('Escondidinho de charque', 'Proteínas', 0),
+          ('Feijoada', 'Proteínas', 0),
+          ('Fígado acebolado', 'Proteínas', 0),
+          ('Frango a Parmegiana', 'Proteínas', 0),
+          ('Frango a quatro queijos com calabresa', 'Proteínas', 0),
+          ('Frango grelhado', 'Proteínas', 0);
+        `;
+        await pool.query(seedQuery);
+        console.log("✅ Tabela menu_items populada com sucesso!");
       }
     })
-    .catch(err => console.error("❌ Erro ao criar/popular tabelas:", err));
+    .catch(err => console.error("❌ Erro ao criar/popular tabelas no PostgreSQL:", err));
+
+} else {
+  console.log("DATABASE_URL não encontrada. Servidor rodando sem banco local.");
+}
+    .then(async () => {
+  console.log("✅ Tabelas criadas/verificadas no PostgreSQL!");
+
+  // Apaga o registro vazio anterior para forçar a criação com produtos
+  const res = await pool.query('SELECT dados FROM config WHERE id = 1');
+  if (res.rowCount === 0 || !res.rows[0].dados.produtos || res.rows[0].dados.produtos.length === 0) {
+
+    const configInicial = {
+      restaurante: "Restaurante do Irmão",
+      categorias: ["Guarnições", "Proteínas", "Bebidas e Sucos", "Sobremesas"],
+      produtos: [
+        { id: 1, nome: "Arroz Branco", categoria: "Guarnições", preco: "0.00", descricao: "Acompanhamento" },
+        { id: 2, nome: "Feijão Macassar", categoria: "Guarnições", preco: "0.00", descricao: "Acompanhamento" },
+        { id: 3, nome: "Escondidinho de Charque", categoria: "Proteínas", preco: "25.00", descricao: "Prato principal" },
+        { id: 4, nome: "Frango a Parmegiana", categoria: "Proteínas", preco: "22.00", descricao: "Prato principal" },
+        { id: 5, nome: "Suco Natural", categoria: "Bebidas e Sucos", preco: "7.00", descricao: "500ml" }
+      ]
+    };
+
+    // Atualiza ou insere o cardápio padrão
+    await pool.query(`
+          INSERT INTO config (id, dados) 
+          VALUES (1, $1) 
+          ON CONFLICT (id) DO UPDATE SET dados = $1
+        `, [JSON.stringify(configInicial)]);
+
+    console.log("✅ Cardápio inicial populado no banco Neon!");
+  }
+})
+  .catch(err => console.error("❌ Erro ao criar/popular tabelas:", err));
 
 } else {
   console.log("DATABASE_URL não encontrada. Servidor rodando sem banco local.");
