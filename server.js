@@ -130,8 +130,12 @@ if (dbUrl) {
 
 const app = express();
 
+// OBRIGATORIO no render para o express-rate-limit funcionar sem travar:
+app.set('trust proxy', 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 const PORT = Number(process.env.PORT || 3000);
 
 const ROOT = __dirname;
