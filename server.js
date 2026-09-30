@@ -29,7 +29,7 @@ if (dbUrl) {
   // Função assíncrona auto-executável (IIFE)
   (async () => {
     try {
-      // 1. Criação das tabelas
+      // 1. Criação das tabelas no banco de dados
       await pool.query(`
         CREATE TABLE IF NOT EXISTS config (
           id INT PRIMARY KEY DEFAULT 1,
@@ -51,7 +51,7 @@ if (dbUrl) {
       `);
       console.log("✅ Tabelas (config, pedidos, menu_items) criadas/verificadas no PostgreSQL!");
 
-      // 2. Inicialização da tabela config
+      // 2. Inicialização da tabela config se estiver vazia
       const resConfig = await pool.query('SELECT dados FROM config WHERE id = 1');
       if (resConfig.rowCount === 0 || !resConfig.rows[0].dados.produtos || resConfig.rows[0].dados.produtos.length === 0) {
         const configInicial = {
@@ -75,7 +75,7 @@ if (dbUrl) {
         console.log("✅ Cardápio inicial populado na tabela config!");
       }
 
-      // 3. Inicialização da tabela menu_items
+      // 3. Inicialização da tabela menu_items se estiver vazia
       const resMenu = await pool.query('SELECT COUNT(*) FROM menu_items');
       if (parseInt(resMenu.rows[0].count) === 0) {
         const seedQuery = `
