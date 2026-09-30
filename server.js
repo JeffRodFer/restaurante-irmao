@@ -70,12 +70,12 @@ if (dbUrl) {
               'INSERT INTO config (id, dados) VALUES (1, $1) ON CONFLICT (id) DO UPDATE SET dados = $1',
               [JSON.stringify(configInicial)]
             )
-            .then(function () {
-              console.log("✅ Cardápio inicial populado na tabela config!");
-            })
-            .catch(function (err) {
-              console.error("Erro ao inserir config:", err);
-            });
+              .then(function () {
+                console.log("✅ Cardápio inicial populado na tabela config!");
+              })
+              .catch(function (err) {
+                console.error("Erro ao inserir config:", err);
+              });
           }
         })
         .catch(function (err) {
@@ -653,8 +653,8 @@ function sameOrigin(req, res, next) {
 
   const allowedOrigins = [
     'http://localhost:3000',
-    'https://sistema-delivery-2wl.onrender.com',
-    'https://sistema-delivery-2in1.onrender.com'
+    'http://localhost:10000',
+    'https://restaurante-irmao.onrender.com' // <-- A URL atualizada do seu site!
   ];
 
   const isAllowed = allowedOrigins.some(allowed => cleanOrigin.startsWith(allowed));
