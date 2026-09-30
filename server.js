@@ -25,7 +25,7 @@ if (dbUrl) {
   });
   console.log("Conexão com o banco configurada com sucesso.");
 
-  // Inicializa as tabelas no PostgreSQL do Render se não existirem
+  // Inicializa as tabelas no PostgreSQL se não existirem
   pool.query(`
     CREATE TABLE IF NOT EXISTS config (
       id INT PRIMARY KEY DEFAULT 1,
@@ -37,13 +37,26 @@ if (dbUrl) {
       criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
   `)
-    .then(() => console.log("✅ Tabelas criadas/verificadas no PostgreSQL!"))
+    .then(async () => {
+      console.log("✅ Tabelas criadas/verificadas no PostgreSQL!");
+
+      // Verifica se a tabela config já possui dados cadastrados
+      const res = await pool.query('SELECT * FROM config WHERE id = 1');
+      if (res.rowCount === 0) {
+        const configInicial = {
+          restaurante: "Restaurante do Irmão",
+          categorias: ["Guarnições", "Proteínas", "Bebidas e Sucos", "Sobremesas"],
+          produtos: []
+        };
+        await pool.query('INSERT INTO config (id, dados) VALUES (1, $1)', [JSON.stringify(configInicial)]);
+        console.log("✅ Configuração padrão inicializada no banco do Neon!");
+      }
+    })
     .catch(err => console.error("❌ Erro ao criar tabelas no PostgreSQL:", err));
 
 } else {
   console.log("DATABASE_URL não encontrada. Servidor rodando sem banco local.");
 }
-
 const app = express();
 
 app.use(express.json());
