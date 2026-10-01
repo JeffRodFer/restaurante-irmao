@@ -1262,20 +1262,15 @@ app.post(
         let bebidas;
         let sobremesas;
 
-
         try {
-
           bebidas =
             parseExtras(
               bebidasInput,
               [
-                'Gaseificadas',
-                'Sucos Naturais 350ml',
-                'Polpas 500ml'
+                'Bebidas e Sucos'
               ],
               'Bebida'
             );
-
 
           sobremesas =
             parseExtras(
@@ -1285,13 +1280,10 @@ app.post(
               ],
               'Sobremesa'
             );
-
         } catch (err) {
-
           return res.status(400).json({
             erro: err.message
           });
-
         }
 
 
