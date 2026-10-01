@@ -245,7 +245,7 @@ const MENU_BASE = [
     'Omelete de Charque',
     'Panqueca de carne',
     'Panqueca de Frango',
-    'Parmegiana de frango',
+    'Peixe a milanesa',
     'Peixe ao molho',
     'Peixe Frito',
     'Polpetone de carne',
