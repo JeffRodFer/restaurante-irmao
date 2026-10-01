@@ -320,7 +320,7 @@ const MENU_BASE = [
   }))
 ];
 
-const PRATOS_COMPLETOS = ['Arrumadinho', 'Feijoada', 'Yakisoba'];
+const PRATOS_COMPLETOS = ['Arrumadinho de charque', 'Arrumadinho de carne de sol', 'Feijoada', 'Yakisoba'];
 
 
 /* =========================================================
