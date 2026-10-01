@@ -1475,33 +1475,7 @@
         </h4>
 
 
-        <div class="choices">
-      ${p.map(x => `
-        <label class="check">
-          <input
-            type="checkbox"
-            data-kind="p"
-            data-index="${i}"
-            data-id="${x.id}"
-          >
-          ${esc(x.nome)}
-        </label>
-      `).join('')}
-    </div> <!-- O SEGREDO ESTÁ AQUI: FECHAR A CAIXA DAS CARNES! -->
-
-    ${qtySection(
-        'Bebidas e Sucos',
-        ['Bebidas e Sucos'],
-        i,
-        'bebidas'
-      )}
-
-    ${qtySection(
-        'Sobremesas',
-        ['Sobremesas'],
-        i,
-        'sobremesas'
-      )}
+        
 
 
       <div class="field">
