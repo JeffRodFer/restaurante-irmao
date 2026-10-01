@@ -657,7 +657,7 @@
       <div class="brand">
 
         <h1>
-          Restaurante do Irmão
+         Restaurante do Irmão
         </h1>
 
         <p>
@@ -2232,7 +2232,7 @@
       if (!calculatedOrder) return;
 
       // 1. Lista de pratos que não exigem guarnições extras
-      const PRATOS_COMPLETOS = ['Arrumadinho de charque', 'Arrumadinho de carne de sol', 'Cozido', 'Feijoada', 'Yakisoba'];
+      const PRATOS_COMPLETOS = ['Arrumadinho de charque', 'Arrumadinho de carne de sol', 'Feijoada', 'Yakisoba'];
 
       // 2. Pega o texto do resumo exibido na tela
       const summaryText = $('orderSummary').innerText;
@@ -2432,23 +2432,33 @@
     /* ADMIN */
 
     function renderAdmin() {
+
       const groups = [
+
         [
           'Guarnições',
           ['Guarnições']
         ],
+
         [
           'Proteínas',
           ['Proteínas']
         ],
+
         [
-          'Bebidas e Sucos',
-          ['Bebidas e Sucos']
+          'Bebidas',
+          [
+            'Gaseificadas',
+            'Sucos Naturais 350ml',
+            'Polpas 500ml'
+          ]
         ],
+
         [
           'Sobremesas',
           ['Sobremesas']
         ]
+
       ];
 
 
