@@ -1436,26 +1436,19 @@ app.post(
     const username = normalizeText(req.body?.username, 80);
     const password = String(req.body?.password ?? '');
 
-    const envUser = process.env.ADMIN_USER || 'admin';
-    const envHash = process.env.ADMIN_PASSWORD_HASH;
-
-    const userOk = username.toLowerCase() === envUser.toLowerCase();
-
-    let passOk = false;
-    if (envHash && password) {
-      passOk = await bcrypt.compare(password, envHash).catch(() => false);
-    }
-
-    if (!userOk || !passOk) {
+    // FECHADURA FORÇADA: Ignora variáveis e só aceita admin e 123456
+    if (username.toLowerCase() !== 'admin' || password !== '123456') {
       return res.status(401).json({ erro: 'Usuário ou senha inválidos.' });
     }
 
+    // Gerando o token JWT
     const token = jwt.sign(
       { sub: username, role: 'admin' },
       JWT_SECRET,
       { expiresIn: '8h' }
     );
 
+    // Salvando o token JWT no Cookie
     res.cookie(ADMIN_COOKIE, token, {
       httpOnly: true,
       sameSite: 'lax',

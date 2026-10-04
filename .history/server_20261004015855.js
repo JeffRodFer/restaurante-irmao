@@ -1442,20 +1442,34 @@ app.post(
     const userOk = username.toLowerCase() === envUser.toLowerCase();
 
     let passOk = false;
+
     if (envHash && password) {
-      passOk = await bcrypt.compare(password, envHash).catch(() => false);
+      passOk = await bcrypt
+        .compare(password, envHash)
+        .catch(() => false);
+
+    } else if (!envHash && password === '123456') {
+      // Chave manual só para o seu PC local
+      passOk = true;
     }
 
     if (!userOk || !passOk) {
-      return res.status(401).json({ erro: 'Usuário ou senha inválidos.' });
+      return res.status(401).json({
+        erro: 'Usuário ou senha inválidos.'
+      });
     }
 
+    // Gerando o token JWT
     const token = jwt.sign(
-      { sub: username, role: 'admin' },
+      {
+        sub: username,
+        role: 'admin'
+      },
       JWT_SECRET,
       { expiresIn: '8h' }
     );
 
+    // Salvando o token JWT no Cookie
     res.cookie(ADMIN_COOKIE, token, {
       httpOnly: true,
       sameSite: 'lax',
@@ -1466,6 +1480,7 @@ app.post(
     return res.json({ ok: true });
   }
 );
+
 app.get('/api/corrigir-bebidas', async (req, res) => {
   try {
     await pool.query(`
@@ -1560,14 +1575,14 @@ app.put(
       // Percorre os itens e atualiza diretamente na base de dados
       for (const change of changes) {
 
-        // 1. Mantém o ID como TEXTO (ex: 'bebida-gaseificada-1')
-        const itemId = String(change.id);
+        // 1. Converte o ID de Texto para Número Inteiro
+        const itemId = Number(change.id);
 
-        // 2. Converte apenas a disponibilidade para Booleano
+        // 2. Converte a palavra de Texto para Booleano Matemático (true/false)
         const isDisponivel = change.disponivel === true || String(change.disponivel).toLowerCase() === 'true';
 
-        // Se o ID existir e não estiver vazio, grava no banco!
-        if (change.id != null && itemId.trim() !== '') {
+        // Se o ID for um número válido, envia a gravação para o banco Neon
+        if (itemId && !isNaN(itemId)) {
           await pool.query(
             'UPDATE menu_items SET disponivel = $1 WHERE id = $2',
             [isDisponivel, itemId]
