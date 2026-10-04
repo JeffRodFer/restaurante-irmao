@@ -997,7 +997,7 @@ app.post(
   `);
 
 
-      const map =
+     const map =
         new Map(
           menuResult.rows.map(item => [
             String(item.id), // 👉 A MÁGICA ACONTECE AQUI (Converte para Texto)
