@@ -1556,7 +1556,7 @@ app.put(
       for (const change of changes) {
         // Verifica se o ID existe (seja ele número ou texto)
         if (change.id != null && String(change.id).trim() !== '') {
-
+          
           const isDisponivel = change.disponivel === true || String(change.disponivel).toLowerCase() === 'true';
 
           try {
