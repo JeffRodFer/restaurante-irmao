@@ -1,40 +1,30 @@
-# Restaurante do Irmão — versão segura do pedido
+# 🍽️ Restaurante do Irmão - Sistema de Delivery Integrado
 
-## Estrutura
+Uma aplicação Web Full-Stack concebida para otimizar e automatizar o atendimento de um restaurante regional. O sistema oferece um cardápio digital interativo para os clientes e integração direta com o WhatsApp, eliminando atritos no processo de venda e estruturando os pedidos automaticamente para a cozinha.
+
+## 🚀 Funcionalidades Principais
+
+- **Cardápio Digital e Carrinho Dinâmico:** Navegação intuitiva pelos produtos, cálculo em tempo real do total de itens (incluindo taxas de entrega) e interface totalmente responsiva.
+- **Integração com WhatsApp:** Os pedidos são validados e enviados de forma automatizada, com uma mensagem estruturada diretamente para a API do WhatsApp do estabelecimento.
+- **Painel de Administração Seguro:** Área restrita para gestão do cardápio e configurações, protegida por um sistema de encriptação de senhas.
+- **Gestão de Estado:** Comunicação assíncrona robusta entre o cliente e o servidor, garantindo a integridade dos dados através de rotas da API.
+
+## 🛠️ Stack Tecnológico
+
+- **Front-end:** HTML5, CSS3, JavaScript (Vanilla, manipulação avançada de DOM e gestão de estado).
+- **Back-end:** Node.js, Express.js.
+- **Base de Dados / Estado:** PostgreSQL (Neon) integrado com persistência local em JSON.
+- **Segurança:** Sistema de *hash* de senhas (`generate-password-hash.js`) para proteção de rotas administrativas.
+- **Infraestrutura:** Render (Deploy da API e Servidor Back-end).
+
+## 📁 Estrutura do Projeto
 
 ```text
 restaurante-do-irmao/
-├── data/
-│   └── menu-state.json
-├── public/
-│   └── index.html
-├── scripts/
-│   └── generate-password-hash.js
-├── .env.example
-├── .gitignore
-├── package.json
-├── README.md
-└── server.js
-
-# 🍽️ Sistema de Cardápio Digital & Pedidos via WhatsApp (Multi-tenant)
-
-Uma aplicação Web Full-Stack responsiva desenvolvida para automatizar o processo de pedidos de restaurantes e estabelecimentos locais. O sistema permite navegação intuitiva pelos produtos, cálculo dinâmico de taxas e envio do pedido formatado diretamente para o WhatsApp do estabelecimento.
-
-## 🚀 Funcionalidades
-
-- **Arquitetura Multi-Tenant por Instância:** Configuração centralizada via `data/config.json`, permitindo adaptar a aplicação para diferentes clientes sem alterar o código-fonte.
-- **Carrinho Dinâmico & Checkout:** Cálculo em tempo real do total de itens, taxas de entrega e mensagens personalizadas.
-- **Integração com WhatsApp:** Envio automatizado do resumo do pedido diretamente para a API do WhatsApp.
-- **Backend em Node.js:** Rota de API (`/api/config`) para servir dados operacionais e de pagamento (chave Pix) de forma segura.
-
-## 🛠️ Tecnologias Utilizadas
-
-- **Front-end:** HTML5, CSS3, JavaScript (ES6+, Async/Await, Manipulação do DOM)
-- **Back-end:** Node.js, Express
-- **Deploy & Hospedagem:** Render / Vercel
-
-## ⚙️ Como Executar o Projeto
-
-1. Clone o repositório:
-   ```bash
-   git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
+├── data/             # Gestão de estado e configurações (menu-state.json)
+├── public/           # Ficheiros estáticos da interface (index.html)
+├── scripts/          # Ferramentas de segurança (generate-password-hash.js)
+├── .env.example      # Variáveis de ambiente de referência
+├── .gitignore        # Regras de exclusão do Git
+├── package.json      # Gestor de dependências Node.js
+└── server.js         # Ponto de entrada da API REST (Express)
