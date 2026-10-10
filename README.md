@@ -1,4 +1,4 @@
-# 🍽️ Restaurante do Irmão - Sistema de Delivery Integrado
+# 🍽️ Sistema de Delivery Integrado
 
 Uma aplicação Web Full-Stack concebida para otimizar e automatizar o atendimento de um restaurante regional. O sistema oferece um cardápio digital interativo para os clientes e integração direta com o WhatsApp, eliminando atritos no processo de venda e estruturando os pedidos automaticamente para a cozinha.
 
