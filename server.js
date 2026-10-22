@@ -654,7 +654,7 @@ function sameOrigin(req, res, next) {
   const allowedOrigins = [
     'http://localhost:3000',
     'http://localhost:10000',
-    'https://restaurante-irmao.onrender.com' // <-- A URL atualizada do seu site!
+    'https://restaurante-irmao.vercel.app' // <-- A URL atualizada do seu site!
   ];
 
   const isAllowed = allowedOrigins.some(allowed => cleanOrigin.startsWith(allowed));
