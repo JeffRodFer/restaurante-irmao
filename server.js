@@ -1594,24 +1594,6 @@ app.use((req, res) => {
 });
 
 /* =========================================================
-   INICIAR SERVIDOR & ANTI-HIBERNAÇÃO
+   EXPORTAR PARA VERCEL (SERVERLESS)
    ========================================================= */
-app.listen(PORT, () => {
-  console.log(`Restaurante do Irmão rodando em http://localhost:${PORT}`);
-
-  // --- ESTRATÉGIA ANTI-HIBERNAÇÃO (SELF-PING DO RENDER) ---
-  const RENDER_URL = process.env.RENDER_EXTERNAL_URL;
-
-  if (RENDER_URL) {
-    const PING_INTERVAL = 14 * 60 * 1000; // 14 minutos
-
-    setInterval(async () => {
-      try {
-        const response = await fetch(`${RENDER_URL}/api/config`);
-        console.log(`[Anti-SpinDown] Ping executado com sucesso: Status ${response.status}`);
-      } catch (error) {
-        console.error('[Anti-SpinDown] Erro ao executar ping:', error.message);
-      }
-    }, PING_INTERVAL);
-  }
-});
+module.exports = app;
