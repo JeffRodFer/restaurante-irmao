@@ -1092,7 +1092,7 @@
     async function loadMenu() {
       try {
         const response = await fetch(
-          '/api/produtos',
+          '/api/menu', // <--- Agora aponta para a rota correta do servidor!
           { cache: 'no-store' }
         );
 
