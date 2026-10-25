@@ -1088,7 +1088,7 @@
 
 
     /* CARREGAR CARDÁPIO */
-   jkkkkync function loadMenu() {
+    async function loadMenu() {
       try {
         const response = await fetch(
           '/api/menu',
@@ -1121,9 +1121,10 @@
         console.warn('Não foi possível carregar o cardápio.');
         menu = [];
       }
-      d
+
+      renderMenu();
     }
-    renderMenu();
+
 
 
     /* RENDERIZAÇÃO DO CARDÁPIO */
