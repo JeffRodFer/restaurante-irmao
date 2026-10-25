@@ -777,49 +777,26 @@ app.get('/api/config', (req, res) => {
 
 app.get('/api/menu', async (req, res) => {
   try {
-    let itens = [];
-
-    // Tenta buscar da função existente
-    try {
-      if (typeof publicMenu === 'function') {
-        itens = await publicMenu();
-      }
-    } catch (err) {
-      console.error("❌ O VERDADEIRO ERRO É:", err);
-      console.warn("Tabela menu_items ainda não existe no Neon. Usando lista padrão.");
-    }
-
-    // Se não encontrou itens no banco ou a tabela não existe, usa os itens padrão:
-    if (!itens || itens.length === 0) {
-      itens = [
-        { id: 1, nome: "Arroz Branco", categoria: "Guarnições", preco: 0 },
-        { id: 2, nome: "Arroz Carioca", categoria: "Guarnições", preco: 0 },
-        { id: 3, nome: "Feijão Macassar", categoria: "Guarnições", preco: 0 },
-        { id: 4, nome: "Feijão Mulato", categoria: "Guarnições", preco: 0 },
-        { id: 5, nome: "Feijão Preto", categoria: "Guarnições", preco: 0 },
-        { id: 6, nome: "Legumes", categoria: "Guarnições", preco: 0 },
-        { id: 7, nome: "Macarrão", categoria: "Guarnições", preco: 0 },
-        { id: 8, nome: "Purê", categoria: "Guarnições", preco: 0 },
-        { id: 9, nome: "Salada", categoria: "Guarnições", preco: 0 },
-        { id: 10, nome: "Almôndegas ao molho", categoria: "Proteínas", preco: 0 },
-        { id: 11, nome: "Empadão de frango", categoria: "Proteínas", preco: 0 },
-        { id: 12, nome: "Escondidinho de charque", categoria: "Proteínas", preco: 0 },
-        { id: 13, nome: "Feijoada", categoria: "Proteínas", preco: 0 },
-        { id: 14, nome: "Fígado acebolado", categoria: "Proteínas", preco: 0 },
-        { id: 15, nome: "Frango a Parmegiana", categoria: "Proteínas", preco: 0 },
-        { id: 16, nome: "Frango a quatro queijos com calabresa", categoria: "Proteínas", preco: 0 },
-        { id: 17, nome: "Frango grelhado", categoria: "Proteínas", preco: 0 }
-      ];
-    }
+    // Consulta direta e oficial à tabela 'produtos' no Neon PostgreSQL
+    const result = await pool.query(`
+      SELECT 
+        id, 
+        nome, 
+        preco, 
+        disponivel, 
+        categoria 
+      FROM produtos 
+      ORDER BY id ASC
+    `);
 
     res.json({
-      basePrice: typeof BASE_PRICE !== 'undefined' ? BASE_PRICE : 0,
-      deliveryPrice: typeof DELIVERY_PRICE !== 'undefined' ? DELIVERY_PRICE : 0,
-      itens
+      basePrice: typeof BASE_PRICE !== 'undefined' ? BASE_PRICE : 20,
+      deliveryPrice: typeof DELIVERY_PRICE !== 'undefined' ? DELIVERY_PRICE : 5,
+      itens: result.rows
     });
 
   } catch (error) {
-    console.error('Erro geral no /api/menu:', error);
+    console.error('❌ Erro crítico ao carregar o menu do banco:', error);
     res.status(500).json({ erro: 'Não foi possível carregar o menu.' });
   }
 });
