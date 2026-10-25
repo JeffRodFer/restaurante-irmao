@@ -1053,11 +1053,10 @@
           cats.includes(
             item.categoria
           ) &&
-          item.disponivel
+          item.disponivelhx
       );
 
     }
-
 
     /* RELÓGIO */
 
@@ -1066,7 +1065,7 @@
       const d =
         new Date();
 
-
+      j
       $('datetime').textContent =
         d.toLocaleString(
           'pt-BR',
@@ -1075,7 +1074,7 @@
             dateStyle: 'short',
             timeStyle: 'medium'
           }
-        );
+        ); HTMLDListElement
 
     }
 
@@ -1089,10 +1088,10 @@
 
 
     /* CARREGAR CARDÁPIO */
-    async function loadMenu() {
+   jkkkkync function loadMenu() {
       try {
         const response = await fetch(
-          '/api/menu', 
+          '/api/menu',
           { cache: 'no-store' }
         );
 
@@ -1122,9 +1121,9 @@
         console.warn('Não foi possível carregar o cardápio.');
         menu = [];
       }
-
-      renderMenu();
+      d
     }
+    renderMenu();
 
 
     /* RENDERIZAÇÃO DO CARDÁPIO */
@@ -1210,7 +1209,7 @@
         +
         section(
           'Bebidas e Sucos',
-          ['Gaseificadas', 'Sucos Naturais 350ml', 'Polpas 500ml'], // Puxa as 3 novas categorias juntas para esta prateleira
+          ['Bebidas e Sucos'], // <-- Alinhado com o nome padrão do banco de dados
           'accent-bebidas',
           true
         )

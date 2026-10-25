@@ -378,7 +378,7 @@ async function publicMenuFromDatabase() {
       nome,
       preco,
       disponivel
-    FROM menu_items
+    FROM produtos -- <--- Alterado de menu_items para produtos!
     ORDER BY id
   `);
 
