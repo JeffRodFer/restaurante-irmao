@@ -1092,7 +1092,7 @@
     async function loadMenu() {
       try {
         const response = await fetch(
-          '/api/menu', // <--- Agora aponta para a rota correta do servidor!
+          '/api/menu', 
           { cache: 'no-store' }
         );
 
@@ -1108,11 +1108,11 @@
         // CORREÇÃO SEGURA: Se o servidor devolver um objeto com a chave 'itens', usa-a. Se devolver a lista direta, usa a lista.
         let rawMenu = Array.isArray(data) ? data : (data.itens || data.items || []);
 
-        // CORREÇÃO: Cria IDs falsos se vierem nulos e converte o texto 'true' para o valor lógico verdadeiro
+        // CORREÇÃO: Cria IDs falsos se vierem nulos e define disponibilidade como verdadeira
         menu = rawMenu.map((item, index) => ({
           ...item,
           id: item.id ? item.id : `produto-ref-${index}`,
-          disponivel: item.disponivel === true || item.disponivel === 'true' || item.disponivel === 't'
+          disponivel: true
         }));
 
         basePrice = Number(data.basePrice) || 20;
