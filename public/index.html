@@ -1105,8 +1105,8 @@
         // Raio-X: Vamos ver o que realmente veio do servidor!
         console.log("Resposta da Vercel:", data);
 
-        // Rede de segurança: aceita 'itens', 'items' ou lista direta
-        let rawMenu = data.itens || data.items || (Array.isArray(data) ? data : []);
+        // CORREÇÃO SEGURA: Se o servidor devolver um objeto com a chave 'itens', usa-a. Se devolver a lista direta, usa a lista.
+        let rawMenu = Array.isArray(data) ? data : (data.itens || data.items || []);
 
         // CORREÇÃO: Cria IDs falsos se vierem nulos e converte o texto 'true' para o valor lógico verdadeiro
         menu = rawMenu.map((item, index) => ({
@@ -1115,8 +1115,8 @@
           disponivel: item.disponivel === true || item.disponivel === 'true' || item.disponivel === 't'
         }));
 
-        basePrice = Number(data.basePrice) || 0;
-        deliveryPrice = Number(data.deliveryPrice) || 0;
+        basePrice = Number(data.basePrice) || 20;
+        deliveryPrice = Number(data.deliveryPrice) || 5;
 
       } catch {
         console.warn('Não foi possível carregar o cardápio.');
