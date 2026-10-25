@@ -1089,58 +1089,41 @@
 
 
     /* CARREGAR CARDÁPIO */
-
     async function loadMenu() {
-
       try {
-
-        const response =
-          await fetch(
-            '/api/menu',
-            {
-              cache: 'no-store'
-            }
-          );
-
+        const response = await fetch(
+          'https://restaurante-irmao.vercel.app/api/produtos',
+          { cache: 'no-store' }
+        );
 
         if (!response.ok) {
           throw new Error();
         }
 
+        const data = await response.json();
 
-        const data =
-          await response.json();
+        // Raio-X: Vamos ver o que realmente veio do servidor!
+        console.log("Resposta da Vercel:", data);
 
+        // Rede de segurança: aceita 'itens', 'items' ou lista direta
+        let rawMenu = data.itens || data.items || (Array.isArray(data) ? data : []);
 
-        menu =
-          data.itens;
+        // CORREÇÃO: Cria IDs falsos se vierem nulos e converte o texto 'true' para o valor lógico verdadeiro
+        menu = rawMenu.map((item, index) => ({
+          ...item,
+          id: item.id ? item.id : `produto-ref-${index}`,
+          disponivel: item.disponivel === true || item.disponivel === 'true' || item.disponivel === 't'
+        }));
 
-
-        basePrice =
-          Number(
-            data.basePrice
-          );
-
-
-        deliveryPrice =
-          Number(
-            data.deliveryPrice
-          );
-
+        basePrice = Number(data.basePrice) || 0;
+        deliveryPrice = Number(data.deliveryPrice) || 0;
 
       } catch {
-
-        console.warn(
-          'Não foi possível carregar o cardápio.'
-        );
-
+        console.warn('Não foi possível carregar o cardápio.');
         menu = [];
-
       }
 
-
       renderMenu();
-
     }
 
 
@@ -1213,28 +1196,28 @@
       $('menu').innerHTML =
         section(
           'Guarnições',
-          ['Guarnições'],
+          ['Guarnições'], // Lê o nome exato do banco de dados
           'accent-guarnicoes',
           true
         )
         +
         section(
           'Proteínas',
-          ['Proteínas'],
+          ['Proteínas'], // Lê o nome exato do banco de dados
           'accent-proteinas',
           true
         )
         +
         section(
           'Bebidas e Sucos',
-          ['Bebidas e Sucos'], // A MÁGICA ACONTECE AQUI!
+          ['Gaseificadas', 'Sucos Naturais 350ml', 'Polpas 500ml'], // Puxa as 3 novas categorias juntas para esta prateleira
           'accent-bebidas',
           true
         )
         +
         section(
           'Sobremesas',
-          ['Sobremesas'],
+          ['Sobremesas'], // Lê o nome exato do banco de dados
           'accent-sobremesas',
           true
         );
@@ -1413,7 +1396,6 @@
           'Guarnições'
         ]);
 
-
       const p =
         available([
           'Proteínas'
@@ -1466,14 +1448,12 @@
 
 
       <div class="choice-group">
-
         <h4>
           Proteínas
           <span class="limit">
             (escolha 1 ou 2)
           </span>
         </h4>
-
 
         <div class="choices">
       ${p.map(x => `
@@ -1487,11 +1467,12 @@
           ${esc(x.nome)}
         </label>
       `).join('')}
-    </div> <!-- O SEGREDO ESTÁ AQUI: FECHAR A CAIXA DAS CARNES! -->
+        </div> <!-- FECHA A CAIXA DAS CARNES -->
+      </div> <!-- FECHA O GRUPO DAS PROTEÍNAS (Faltava este!) -->
 
     ${qtySection(
-        'Bebidas e Sucos',
-        ['Bebidas e Sucos'],
+        'Bebidas', // Título que aparece para o cliente
+        ['Gaseificadas', 'Sucos Naturais 350ml', 'Polpas 500ml'], // As novas categorias do banco!
         i,
         'bebidas'
       )}
@@ -1503,32 +1484,22 @@
         'sobremesas'
       )}
 
-
       <div class="field">
-
         <label>
-
           Observação
-
           <span class="limit">
             (máx. 90 caracteres)
           </span>
-
         </label>
-
 
         <textarea
           maxlength="90"
           data-obs="${i}"
           placeholder="Ex.: Bastante molho de fígado."
         ></textarea>
-
       </div>
-
     </div>
-
   `;
-
     }
 
 
@@ -2088,20 +2059,13 @@
 
       const response =
         await fetch(
-          '/api/orders',
+          '/api/orders', // 👈 AQUI: Trocamos o link gigante pelo caminho relativo curto!
           {
             method: 'POST',
-
             headers: {
-              'Content-Type':
-                'application/json'
+              'Content-Type': 'application/json'
             },
-
-            body:
-              JSON.stringify(
-                payload
-              )
-
+            body: JSON.stringify(payload)
           }
         );
 
@@ -2663,6 +2627,7 @@
 
     async function carregarConfiguracoes() {
       try {
+        // 👇 AQUI: Trocamos o link completo pelo caminho relativo!
         const resposta = await fetch('/api/config');
         if (resposta.ok) {
           restauranteConfig = await resposta.json();
