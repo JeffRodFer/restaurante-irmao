@@ -1567,116 +1567,42 @@
     }
 
 
-    /* RENDERIZAR MARMITAS */
-
-    function renderMarmitas() {
-
-      $('marmitas').innerHTML =
-        orderState.marmitas
-          .map(choiceHTML)
-          .join('');
-
-
-      syncFormToState();
-
-    }
-
+    /* =========================================================
+       SINCRONIZAR FORMULÁRIO PARA O ESTADO (CORRIGIDO)
+       ========================================================= */
 
     function syncFormToState() {
-
+      // 1. Lê os checkboxes de guarnições e proteínas marcados no HTML e atualiza o orderState
       document
-        .querySelectorAll(
-          '#marmitas input[data-kind]'
-        )
-        .forEach(
-          el => {
+        .querySelectorAll('#marmitas input[data-kind]')
+        .forEach(el => {
+          const i = Number(el.dataset.index);
+          const key = el.dataset.kind === 'g' ? 'guarnicoes' : 'proteinas';
+          const id = el.dataset.id;
 
-            const i =
-              Number(
-                el.dataset.index
-              );
-
-
-            const key =
-              el.dataset.kind === 'g'
-                ? 'guarnicoes'
-                : 'proteinas';
-
-
-            el.checked =
-              orderState
-                .marmitas[i][key]
-                .includes(
-                  el.dataset.id
-                );
-
+          // Garante que o array existe na marmita
+          if (!orderState.marmitas[i][key]) {
+            orderState.marmitas[i][key] = [];
           }
-        );
 
+          const indexInState = orderState.marmitas[i][key].indexOf(id);
 
+          if (el.checked && indexInState === -1) {
+            orderState.marmitas[i][key].push(id);
+          } else if (!el.checked && indexInState !== -1) {
+            orderState.marmitas[i][key].splice(indexInState, 1);
+          }
+        });
+
+      // 2. Lê as observações digitadas
       document
-        .querySelectorAll(
-          '#marmitas textarea[data-obs]'
-        )
-        .forEach(
-          el => {
-
-            el.value =
-              orderState
-                .marmitas[
-                Number(el.dataset.obs)
-              ]
-                .observacao;
-
+        .querySelectorAll('#marmitas textarea[data-obs]')
+        .forEach(el => {
+          const i = Number(el.dataset.obs);
+          if (orderState.marmitas[i]) {
+            orderState.marmitas[i].observacao = el.value;
           }
-        );
-
-
-      for (
-        const [
-          i,
-          m
-        ]
-        of orderState.marmitas.entries()
-      ) {
-
-        for (
-          const key
-          of [
-            'bebidas',
-            'sobremesas'
-          ]
-        ) {
-
-          for (
-            const [
-              id,
-              q
-            ]
-            of Object.entries(
-              m[key]
-            )
-          ) {
-
-            const el =
-              $(
-                `q-${key}-${i}-${id}`
-              );
-
-
-            if (el) {
-
-              el.textContent =
-                q;
-
-            }
-
-          }
-
-        }
-
-      }
-
+        });
     }
 
 
