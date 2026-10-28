@@ -1971,15 +1971,16 @@
 
 
     /* =====================================================
-       CALCULAR PEDIDO NO SERVIDOR
-       ===================================================== */
+   CALCULAR PEDIDO NO SERVIDOR (CORRIGIDO)
+   ===================================================== */
 
     async function calculateOrder() {
+      clearErr('orderError2');
 
-      clearErr(
-        'orderError2'
-      );
-
+      // 🔥 PASSO CRUCIAL: Sincroniza os cliques dos inputs do HTML para dentro do orderState antes de validar!
+      if (typeof syncFormToState === 'function') {
+        syncFormToState();
+      }
 
       const invalid =
         orderState.marmitas
@@ -1990,79 +1991,47 @@
               m.guarnicoes.length > 4
           );
 
-
       if (invalid >= 0) {
-
         showErr(
           'orderError2',
           `Marmita ${invalid + 1}: escolha 1 ou 2 proteínas e no máximo 4 guarnições.`
         );
-
         return false;
-
       }
-
 
       const payload = {
-
-        nome:
-          orderState.nome,
-
-        telefone:
-          orderState.telefone,
-
-        endereco:
-          orderState.address,
-
-        entrega:
-          orderState.entrega,
-
-        marmitas:
-          orderState.marmitas
-
+        nome: orderState.nome,
+        telefone: orderState.telefone,
+        endereco: orderState.address,
+        entrega: orderState.entrega,
+        marmitas: orderState.marmitas
       };
 
+      const response = await fetch(
+        '/api/orders',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        }
+      );
 
-      const response =
-        await fetch(
-          '/api/orders', // 👈 AQUI: Trocamos o link gigante pelo caminho relativo curto!
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-          }
-        );
-
-
-      const data =
-        await response
-          .json()
-          .catch(
-            () => ({})
-          );
-
+      const data = await response
+        .json()
+        .catch(() => ({}));
 
       if (!response.ok) {
-
         showErr(
           'orderError2',
-          data.erro ||
-          'Não foi possível calcular o pedido.'
+          data.erro || 'Não foi possível calcular o pedido.'
         );
-
         return false;
-
       }
 
-
-      calculatedOrder =
-        data;
-
-
+      calculatedOrder = data;
       return true;
-
     }
 
 
