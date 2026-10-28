@@ -1384,122 +1384,88 @@
     }
 
 
-    /* HTML DE UMA MARMITA */
+    /* =========================================================
+       HTML DE UMA MARMITA
+       ========================================================= */
 
-    function choiceHTML(
-      m,
-      i
-    ) {
-
-      const g =
-        available([
-          'Guarnições'
-        ]);
-
-      const p =
-        available([
-          'Proteínas'
-        ]);
-
+    function choiceHTML(m, i) {
+      const g = available(['Guarnições']);
+      const p = available(['Proteínas']);
 
       return `
+        <div class="marmita">
+          <h3>
+            Marmita ${String(i + 1).padStart(2, '0')}
+            — base ${money(basePrice)}
+          </h3>
 
-    <div class="marmita">
+          <div class="choice-group">
+            <h4>
+              Guarnições
+              <span class="limit">(máx. 4)</span>
+            </h4>
+            <div class="choices">
+              ${g.map(x => `
+                <label class="check">
+                  <input
+                    type="checkbox"
+                    data-kind="g"
+                    data-index="${i}"
+                    data-id="${x.id}"
+                  >
+                  ${esc(x.nome)}
+                </label>
+              `).join('')}
+            </div>
+          </div>
 
-      <h3>
-        Marmita
-        ${String(i + 1).padStart(2, '0')}
-        — base ${money(basePrice)}
-      </h3>
+          <div class="choice-group">
+            <h4>
+              Proteínas
+              <span class="limit">(escolha 1 ou 2)</span>
+            </h4>
+            <div class="choices">
+              ${p.map(x => `
+                <label class="check">
+                  <input
+                    type="checkbox"
+                    data-kind="p"
+                    data-index="${i}"
+                    data-id="${x.id}"
+                  >
+                  ${esc(x.nome)}
+                </label>
+              `).join('')}
+            </div>
+          </div>
 
-
-      <div class="choice-group">
-
-        <h4>
-          Guarnições
-          <span class="limit">
-            (máx. 4)
-          </span>
-        </h4>
-
-
-        <div class="choices">
-
-          ${g.map(x => `
-
-            <label class="check">
-
-              <input
-                type="checkbox"
-                data-kind="g"
-                data-index="${i}"
-                data-id="${x.id}"
-              >
-
-              ${esc(x.nome)}
-
-            </label>
-
-          `).join('')}
-
-        </div>
-
-      </div>
-
-
-      <div class="choice-group">
-        <h4>
-          Proteínas
-          <span class="limit">
-            (escolha 1 ou 2)
-          </span>
-        </h4>
-
-        <div class="choices">
-      ${p.map(x => `
-        <label class="check">
-          <input
-            type="checkbox"
-            data-kind="p"
-            data-index="${i}"
-            data-id="${x.id}"
-          >
-          ${esc(x.nome)}
-        </label>
-      `).join('')}
-        </div> <!-- FECHA A CAIXA DAS CARNES -->
-      </div> <!-- FECHA O GRUPO DAS PROTEÍNAS (Faltava este!) -->
-
-    ${qtySection(
-        'Bebidas', // Título que aparece para o cliente
-        ['Gaseificadas', 'Sucos Naturais 350ml', 'Polpas 500ml'], // As novas categorias do banco!
+          ${qtySection(
+        'Bebidas',
+        ['Gaseificadas', 'Sucos Naturais 350ml', 'Polpas 500ml'],
         i,
         'bebidas'
       )}
 
-    ${qtySection(
+          ${qtySection(
         'Sobremesas',
         ['Sobremesas'],
         i,
         'sobremesas'
       )}
 
-      <div class="field">
-        <label>
-          Observação
-          <span class="limit">
-            (máx. 90 caracteres)
-          </span>
-        </label>
-
-        <textarea
-          maxlength="90"
-          data-obs="${i}"
-          placeholder="Ex.: Bastante molho de fígado."
-        ></textarea>
-      </div>
-    </div>
-  `;
+          <div class="field">
+            <label>
+              Observação
+              <span class="limit">(máx. 90 caracteres)</span>
+            </label>
+            <textarea
+              maxlength="90"
+              data-obs="${i}"
+              placeholder="Ex.: Bastante molho de fígado."
+            ></textarea>
+          </div>
+        </div>
+      `;
     }
 
 
