@@ -1568,6 +1568,22 @@
 
 
     /* =========================================================
+       RENDERIZAR MARMITAS
+       ========================================================= */
+
+    function renderMarmitas() {
+      const container = $('marmitas');
+      if (!container) return;
+
+      container.innerHTML = orderState.marmitas
+        .map(choiceHTML)
+        .join('');
+
+      syncFormToState();
+    }
+
+
+    /* =========================================================
        SINCRONIZAR FORMULÁRIO PARA O ESTADO (CORRIGIDO)
        ========================================================= */
 
